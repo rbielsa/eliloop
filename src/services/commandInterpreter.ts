@@ -114,7 +114,7 @@ export async function processCommand(
     }
 
     if (/^lo dejo$/.test(normalized)) {
-      await updateProject(currentProject)
+      await persistPartChanges(currentProject, currentPart)
       speak('Ok. Guardado.')
       dispatch({ type: 'RESET' })
       return { project: null, part: null }
