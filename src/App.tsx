@@ -115,6 +115,15 @@ export default function App() {
     startListeningContinuous()
   }, [startListeningContinuous])
 
+  const handleSettingsSaved = useCallback((updatedProject: Project, updatedPart: Part | null) => {
+    setProject(updatedProject)
+    setPart(updatedPart)
+    if (!updatedPart) {
+      dispatch({ type: 'RESET' })
+      loadProjects()
+    }
+  }, [loadProjects])
+
   if (!ready) {
     return (
       <div className="app">
@@ -124,15 +133,6 @@ export default function App() {
   }
 
   const isIdle = session.conversationState === 'idle' && !project
-
-  const handleSettingsSaved = useCallback((updatedProject: Project, updatedPart: Part | null) => {
-    setProject(updatedProject)
-    setPart(updatedPart)
-    if (!updatedPart) {
-      dispatch({ type: 'RESET' })
-      loadProjects()
-    }
-  }, [loadProjects])
 
   return (
     <div className="app">
