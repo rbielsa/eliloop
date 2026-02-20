@@ -1,53 +1,103 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+
 *,
 *::before,
 *::after {
   box-sizing: border-box;
 }
 
+:root {
+  --glass-bg: rgba(255, 255, 255, 0.08);
+  --glass-border: rgba(255, 255, 255, 0.15);
+  --glass-blur: 16px;
+  --accent: #f472b6;
+  --accent-glow: rgba(244, 114, 182, 0.35);
+  --text-primary: #fdf2f8;
+  --text-secondary: rgba(253, 242, 248, 0.6);
+  --text-muted: rgba(253, 242, 248, 0.4);
+  --radius: 16px;
+}
+
 body {
   margin: 0;
   min-height: 100vh;
-  background: #1a1a2e;
-  color: #eee;
-  font-family: system-ui, -apple-system, sans-serif;
+  color: var(--text-primary);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: linear-gradient(135deg, #1a1a2e 0%, #2d1b3d 35%, #1a1a2e 65%, #162447 100%);
+  background-attachment: fixed;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 600px 400px at 20% 20%, rgba(244, 114, 182, 0.12), transparent),
+    radial-gradient(ellipse 500px 500px at 80% 80%, rgba(99, 102, 241, 0.1), transparent);
+  pointer-events: none;
+  z-index: 0;
 }
 
 .app {
+  position: relative;
+  z-index: 1;
   min-height: 100vh;
   max-width: 480px;
   margin: 0 auto;
-  padding: 1rem;
+  padding: 1.5rem 1rem 2rem;
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 0.75rem;
 }
 
 .loading {
   margin: 2rem;
-  color: #888;
+  color: var(--text-muted);
 }
 
+/* ---- Glass panel mixin ---- */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+}
+
+/* ---- Project Header ---- */
 .project-header {
   text-align: center;
-  margin-bottom: 1rem;
+  padding: 1rem 1.5rem;
+  width: 100%;
 }
 
 .project-name {
-  font-size: 1.25rem;
-  font-weight: 600;
+  font-size: 1.15rem;
+  font-weight: 700;
   margin: 0;
+  letter-spacing: 0.02em;
+  color: var(--text-primary);
 }
 
 .project-name.placeholder {
-  color: #666;
+  font-size: 1.4rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--accent), #a78bfa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .part-name {
-  font-size: 1rem;
-  color: #aaa;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
   margin: 0.25rem 0 0;
+  font-weight: 400;
 }
 
+/* ---- Main area ---- */
 .main {
   flex: 1;
   width: 100%;
@@ -55,23 +105,33 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 0.5rem;
 }
 
+/* ---- Row display ---- */
 .row-display {
   text-align: center;
-  margin: 1rem 0;
+  padding: 1.5rem 2rem;
+  width: 100%;
+  max-width: 320px;
 }
 
 .row-number {
-  font-size: clamp(4rem, 20vw, 8rem);
-  font-weight: 700;
+  font-size: clamp(5rem, 22vw, 9rem);
+  font-weight: 800;
   line-height: 1;
+  background: linear-gradient(180deg, #fff 30%, var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 30px var(--accent-glow));
 }
 
+/* ---- History ---- */
 .history-list {
   list-style: none;
-  padding: 0;
-  margin: 1.5rem 0 0;
+  padding: 0.75rem 1rem;
+  margin: 0;
   width: 100%;
   max-width: 320px;
 }
@@ -80,90 +140,112 @@ body {
   display: flex;
   justify-content: space-between;
   padding: 0.5rem 0;
-  border-bottom: 1px solid #333;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+}
+
+.history-item + .history-item {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .history-row {
-  color: #ccc;
+  color: var(--text-secondary);
+  font-weight: 600;
 }
 
 .history-time {
-  color: #888;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
 }
 
+/* ---- Status bar ---- */
 .status-bar {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin: 1rem 0;
   min-height: 1.5rem;
+  padding: 0.5rem 1rem;
 }
 
 .status-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #e94560;
-  animation: pulse 1s ease-in-out infinite;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent-glow);
+  animation: pulse 1.2s ease-in-out infinite;
 }
 
 .status-text {
-  font-size: 0.85rem;
-  color: #888;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
 }
 
+/* ---- Last heard ---- */
 .last-heard {
-  font-size: 0.9rem;
-  color: #aaa;
-  margin: 0.5rem 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
   max-width: 100%;
   word-break: break-word;
   text-align: center;
+  padding: 0.4rem 1rem;
 }
 
 .last-heard strong {
-  color: #e94560;
+  color: var(--accent);
 }
 
+/* ---- Listen button ---- */
 .listen-button {
   width: 100%;
   max-width: 280px;
   padding: 1rem 1.5rem;
-  font-size: 1.25rem;
-  font-weight: 600;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
   color: #1a1a2e;
-  background: #eee;
-  border: none;
-  border-radius: 12px;
+  background: linear-gradient(135deg, #fdf2f8, #fbcfe8);
+  border: 1px solid rgba(244, 114, 182, 0.3);
+  border-radius: 50px;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  margin-top: auto;
+  margin-bottom: 0.5rem;
 }
 
 .listen-button:hover:not(:disabled) {
-  background: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 28px rgba(244, 114, 182, 0.25);
+}
+
+.listen-button:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .listen-button:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
 .listen-button.listening {
-  background: #e94560;
+  background: linear-gradient(135deg, var(--accent), #a78bfa);
   color: #fff;
+  border-color: transparent;
+  box-shadow: 0 0 30px var(--accent-glow);
+  animation: glow-pulse 2s ease-in-out infinite;
 }
 
-.listen-button.listening:hover {
-  background: #ff6b6b;
-}
-
+/* ---- Animations ---- */
 @keyframes pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.4;
-  }
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 20px var(--accent-glow); }
+  50% { box-shadow: 0 0 40px var(--accent-glow), 0 0 60px rgba(244, 114, 182, 0.15); }
 }

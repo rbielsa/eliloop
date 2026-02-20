@@ -5,7 +5,7 @@ type ProjectHeaderProps = {
 
 export function ProjectHeader({ projectName, partName }: ProjectHeaderProps) {
   return (
-    <header className="project-header">
+    <header className="project-header glass">
       {projectName && <h1 className="project-name">{projectName}</h1>}
       {partName && <p className="part-name">{partName}</p>}
       {!projectName && !partName && (

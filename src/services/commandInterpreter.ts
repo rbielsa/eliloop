@@ -37,7 +37,7 @@ export async function processCommand(
       /^eliloop\s+(.+)$/.exec(normalized) ??
       /^el hilo\s+(.+)$/.exec(normalized)
     if (onlyEliLoop) {
-      speak('¿Qué proyecto?')
+      speak('Ok. ¿Qué proyecto?')
       dispatch({ type: 'SET_CONVERSATION_STATE', payload: 'awaitingProject' })
       return { project: currentProject, part: currentPart }
     }
@@ -47,7 +47,7 @@ export async function processCommand(
       if (!project) {
         project = await createProject(projectName)
       }
-      speak('¿Qué parte?')
+      speak('Ok. ¿Qué parte?')
       dispatch({ type: 'SET_PROJECT', payload: project.id })
       dispatch({ type: 'SET_CONVERSATION_STATE', payload: 'awaitingPart' })
       return { project, part: null }
@@ -61,7 +61,7 @@ export async function processCommand(
     if (!project) {
       project = await createProject(projectName)
     }
-    speak('¿Qué parte?')
+    speak('Ok. ¿Qué parte?')
     dispatch({ type: 'SET_PROJECT', payload: project.id })
     dispatch({ type: 'SET_CONVERSATION_STATE', payload: 'awaitingPart' })
     return { project, part: null }
@@ -75,8 +75,7 @@ export async function processCommand(
       currentProject.parts = [...currentProject.parts, part]
       await updateProject(currentProject)
     }
-    const rowMsg = `Vas por vuelta ${part.currentRow}`
-    speak(rowMsg)
+    speak(`Ok. Vas por vuelta ${part.currentRow}`)
     dispatch({ type: 'SET_PART', payload: part.id })
     dispatch({ type: 'SET_CONVERSATION_STATE', payload: 'tracking' })
     return { project: currentProject, part }
@@ -110,13 +109,13 @@ export async function processCommand(
     }
 
     if (/^por donde voy/.test(normalized)) {
-      speak(`Vas por vuelta ${currentPart.currentRow}`)
+      speak(`Vuelta ${currentPart.currentRow}`)
       return { project: currentProject, part: currentPart }
     }
 
     if (/^lo dejo$/.test(normalized)) {
       await updateProject(currentProject)
-      speak('Guardado.')
+      speak('Ok. Guardado.')
       dispatch({ type: 'RESET' })
       return { project: null, part: null }
     }
@@ -124,7 +123,7 @@ export async function processCommand(
     if (updated) {
       const partUpdated = appendRowEntry(currentPart, newRow)
       await persistPartChanges(currentProject, partUpdated)
-      speak(`Vuelta ${newRow}`)
+      speak(`Ok. ${newRow}`)
       return { project: currentProject, part: partUpdated }
     }
   }

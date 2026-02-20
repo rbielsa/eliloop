@@ -9,7 +9,7 @@ export function HistoryList({ entries }: HistoryListProps) {
   const lastFive = entries.slice(-5).reverse()
   if (lastFive.length === 0) return null
   return (
-    <ul className="history-list">
+    <ul className="history-list glass">
       {lastFive.map((entry, i) => (
         <li key={`${entry.rowNumber}-${entry.timestamp}-${i}`} className="history-item">
           <span className="history-row">Vuelta {entry.rowNumber}</span>

@@ -14,7 +14,7 @@ const stateLabels: Record<ConversationState, string> = {
 
 export function StatusBar({ listening, conversationState }: StatusBarProps) {
   return (
-    <div className="status-bar">
+    <div className="status-bar glass">
       {listening && <span className="status-dot" aria-hidden />}
       <span className="status-text">{stateLabels[conversationState]}</span>
     </div>
