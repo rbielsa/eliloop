@@ -34,7 +34,12 @@ export function ProjectList({ projects, onSelectPart }: ProjectListProps) {
                   onClick={() => onSelectPart(proj, part.id)}
                 >
                   <span className="part-button-name">{part.name}</span>
+                  <span className="part-button-meta">
                   <span className="part-button-row">vuelta {part.currentRow}</span>
+                  {part.repeatEvery != null && part.repeatEvery > 0 && (
+                    <span className="part-button-repeat">cada {part.repeatEvery}</span>
+                  )}
+                </span>
                 </button>
               </li>
             ))}

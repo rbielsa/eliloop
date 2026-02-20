@@ -42,16 +42,26 @@ export async function createProject(name: string): Promise<Project> {
   return project
 }
 
+function normalizePart(part: Part & { repeatEvery?: number | null }): Part {
+  return { ...part, repeatEvery: part.repeatEvery ?? null }
+}
+
+function normalizeProject(p: Project): Project {
+  return { ...p, parts: p.parts.map(normalizePart) }
+}
+
 export async function getProjectByName(name: string): Promise<Project | undefined> {
   const db = await getDB()
   const normalized = normalizeText(name)
   const all = await db.getAll(STORE_NAME)
-  return all.find((p) => normalizeText(p.name) === normalized)
+  const found = all.find((p) => normalizeText(p.name) === normalized)
+  return found ? normalizeProject(found) : undefined
 }
 
 export async function getProjectById(id: string): Promise<Project | undefined> {
   const db = await getDB()
-  return db.get(STORE_NAME, id)
+  const p = await db.get(STORE_NAME, id)
+  return p ? normalizeProject(p) : undefined
 }
 
 export async function updateProject(project: Project): Promise<void> {
@@ -62,7 +72,8 @@ export async function updateProject(project: Project): Promise<void> {
 
 export async function getAllProjects(): Promise<Project[]> {
   const db = await getDB()
-  return db.getAll(STORE_NAME)
+  const all = await db.getAll(STORE_NAME)
+  return all.map(normalizeProject)
 }
 
 export function createPart(name: string): Part {
@@ -70,6 +81,7 @@ export function createPart(name: string): Part {
     id: generateId(),
     name: name.trim(),
     currentRow: 0,
+    repeatEvery: null,
     history: [],
   }
 }
@@ -94,4 +106,15 @@ export async function persistPartChanges(project: Project, part: Part): Promise<
     updatedAt: new Date().toISOString(),
   }
   await updateProject(projectUpdated)
+}
+
+export async function deletePartFromProject(project: Project, partId: string): Promise<Project> {
+  const parts = project.parts.filter((p) => p.id !== partId)
+  const projectUpdated: Project = {
+    ...project,
+    parts,
+    updatedAt: new Date().toISOString(),
+  }
+  await updateProject(projectUpdated)
+  return projectUpdated
 }

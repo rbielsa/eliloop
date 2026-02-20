@@ -10,6 +10,7 @@ export type Part = {
   id: string
   name: string
   currentRow: number
+  repeatEvery: number | null
   history: RowEntry[]
 }
 
@@ -22,6 +23,7 @@ export type ConversationState =
   | 'idle'
   | 'awaitingProject'
   | 'awaitingPart'
+  | 'awaitingRepeat'
   | 'tracking'
 
 export type SessionState = {

@@ -9,6 +9,7 @@ const stateLabels: Record<ConversationState, string> = {
   idle: 'En espera',
   awaitingProject: 'Di el proyecto',
   awaitingPart: 'Di la parte',
+  awaitingRepeat: '¿Cada cuántas vueltas?',
   tracking: 'Contando',
 }
 

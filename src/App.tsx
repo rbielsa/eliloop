@@ -7,7 +7,9 @@ import * as voiceService from './services/voiceService'
 import { processCommand } from './services/commandInterpreter'
 import { ProjectHeader } from './components/ProjectHeader'
 import { ProjectList } from './components/ProjectList'
+import { PartSettings } from './components/PartSettings'
 import { RowDisplay } from './components/RowDisplay'
+import { AudioVisualiser } from './components/AudioVisualiser'
 import { HistoryList } from './components/HistoryList'
 import { ListenButton } from './components/ListenButton'
 import { StatusBar } from './components/StatusBar'
@@ -20,6 +22,7 @@ export default function App() {
   const [ready, setReady] = useState(false)
   const [lastHeard, setLastHeard] = useState<string>('')
   const [allProjects, setAllProjects] = useState<Project[]>([])
+  const [showSettings, setShowSettings] = useState(false)
 
   const projectRef = useRef(project)
   const partRef = useRef(part)
@@ -122,9 +125,31 @@ export default function App() {
 
   const isIdle = session.conversationState === 'idle' && !project
 
+  const handleSettingsSaved = useCallback((updatedProject: Project, updatedPart: Part | null) => {
+    setProject(updatedProject)
+    setPart(updatedPart)
+    if (!updatedPart) {
+      dispatch({ type: 'RESET' })
+      loadProjects()
+    }
+  }, [loadProjects])
+
   return (
     <div className="app">
-      <ProjectHeader projectName={project?.name ?? null} partName={part?.name ?? null} />
+      <ProjectHeader
+        projectName={project?.name ?? null}
+        partName={part?.name ?? null}
+        onSettingsClick={part ? () => setShowSettings(true) : undefined}
+      />
+
+      {showSettings && project && part && (
+        <PartSettings
+          project={project}
+          part={part}
+          onClose={() => setShowSettings(false)}
+          onSaved={handleSettingsSaved}
+        />
+      )}
 
       {isIdle ? (
         <main className="main">
@@ -132,7 +157,11 @@ export default function App() {
         </main>
       ) : (
         <main className="main">
-          <RowDisplay currentRow={part?.currentRow ?? 0} />
+          <RowDisplay
+            currentRow={part?.currentRow ?? 0}
+            repeatEvery={part?.repeatEvery ?? null}
+          />
+          <AudioVisualiser active={session.listening} />
           <HistoryList entries={part?.history ?? []} />
         </main>
       )}

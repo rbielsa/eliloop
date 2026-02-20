@@ -1,5 +1,6 @@
 import { normalizeText } from '../utils/normalizeText'
 import { speak } from './speechSynthesis'
+import { playTone } from './audioService'
 import type { SessionState, Project, Part } from '../types'
 import type { SessionAction } from '../store/sessionStore'
 import {
@@ -69,16 +70,40 @@ export async function processCommand(
 
   if (state === 'awaitingPart' && currentProject) {
     const partName = normalized.trim()
-    let part = currentProject.parts.find((p) => normalizeText(p.name) === normalizeText(partName))
-    if (!part) {
-      part = createPart(partName)
-      currentProject.parts = [...currentProject.parts, part]
-      await updateProject(currentProject)
+    const existing = currentProject.parts.find((p) => normalizeText(p.name) === normalizeText(partName))
+    if (existing) {
+      speak(`Ok. Vas por vuelta ${existing.currentRow}`)
+      dispatch({ type: 'SET_PART', payload: existing.id })
+      dispatch({ type: 'SET_CONVERSATION_STATE', payload: 'tracking' })
+      return { project: currentProject, part: existing }
     }
-    speak(`Ok. Vas por vuelta ${part.currentRow}`)
+    const part = createPart(partName)
+    currentProject.parts = [...currentProject.parts, part]
+    await updateProject(currentProject)
+    speak('¿Cada cuántas vueltas aviso?')
     dispatch({ type: 'SET_PART', payload: part.id })
-    dispatch({ type: 'SET_CONVERSATION_STATE', payload: 'tracking' })
+    dispatch({ type: 'SET_CONVERSATION_STATE', payload: 'awaitingRepeat' })
     return { project: currentProject, part }
+  }
+
+  if (state === 'awaitingRepeat' && currentProject && currentPart) {
+    const numMatch = /^(\d+)$/.exec(normalized)
+    if (numMatch) {
+      const n = parseInt(numMatch[1], 10)
+      if (n > 0) {
+        const partUpdated = { ...currentPart, repeatEvery: n }
+        await persistPartChanges(currentProject, partUpdated)
+        speak(`Ok. Aviso cada ${n}. Vas por vuelta ${currentPart.currentRow}`)
+        dispatch({ type: 'SET_CONVERSATION_STATE', payload: 'tracking' })
+        return { project: currentProject, part: partUpdated }
+      }
+    }
+    if (/^(no|ninguno|nada)$/.test(normalized)) {
+      speak(`Ok. Vas por vuelta ${currentPart.currentRow}`)
+      dispatch({ type: 'SET_CONVERSATION_STATE', payload: 'tracking' })
+      return { project: currentProject, part: currentPart }
+    }
+    return { project: currentProject, part: currentPart }
   }
 
   if (state === 'tracking' && currentProject && currentPart) {
@@ -108,6 +133,26 @@ export async function processCommand(
       }
     }
 
+    if (/^avisa cada (\d+)$/.test(normalized)) {
+      const match = /^avisa cada (\d+)$/.exec(normalized)
+      if (match) {
+        const n = parseInt(match[1], 10)
+        if (n > 0) {
+          const partUpdated = { ...currentPart, repeatEvery: n }
+          await persistPartChanges(currentProject, partUpdated)
+          speak(`Ok. Aviso cada ${n}`)
+          return { project: currentProject, part: partUpdated }
+        }
+      }
+    }
+
+    if (/^quita aviso$/.test(normalized)) {
+      const partUpdated = { ...currentPart, repeatEvery: null }
+      await persistPartChanges(currentProject, partUpdated)
+      speak('Ok. Sin aviso')
+      return { project: currentProject, part: partUpdated }
+    }
+
     if (/^por donde voy/.test(normalized)) {
       speak(`Vuelta ${currentPart.currentRow}`)
       return { project: currentProject, part: currentPart }
@@ -123,7 +168,13 @@ export async function processCommand(
     if (updated) {
       const partUpdated = appendRowEntry(currentPart, newRow)
       await persistPartChanges(currentProject, partUpdated)
-      speak(`Ok. ${newRow}`)
+      const repeatEvery = partUpdated.repeatEvery ?? null
+      if (repeatEvery && repeatEvery > 0 && newRow % repeatEvery === 0) {
+        playTone(880, 150)
+        speak(`Cambio. Vuelta ${newRow}`)
+      } else {
+        speak(`Ok. ${newRow}`)
+      }
       return { project: currentProject, part: partUpdated }
     }
   }
