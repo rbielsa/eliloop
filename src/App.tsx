@@ -14,6 +14,7 @@ import { HistoryList } from './components/HistoryList'
 import { ListenButton } from './components/ListenButton'
 import { StatusBar } from './components/StatusBar'
 import { TrackingButtons } from './components/TrackingButtons'
+import { CreateProjectPart } from './components/CreateProjectPart'
 import './App.css'
 
 export default function App() {
@@ -24,6 +25,7 @@ export default function App() {
   const [lastHeard, setLastHeard] = useState<string>('')
   const [allProjects, setAllProjects] = useState<Project[]>([])
   const [showSettings, setShowSettings] = useState(false)
+  const [showCreate, setShowCreate] = useState(false)
 
   const projectRef = useRef(project)
   const partRef = useRef(part)
@@ -151,6 +153,31 @@ export default function App() {
     }
   }, [loadProjects])
 
+  const handleCreatedFromTouch = useCallback(
+    (proj: Project, selectedPart: Part) => {
+      setShowCreate(false)
+      setProject(proj)
+      setPart(selectedPart)
+      projectRef.current = proj
+      partRef.current = selectedPart
+      sessionRef.current = {
+        ...sessionRef.current,
+        activeProjectId: proj.id,
+        activePartId: selectedPart.id,
+        conversationState: 'tracking',
+      }
+      dispatch({ type: 'SET_PROJECT', payload: proj.id })
+      dispatch({ type: 'SET_PART', payload: selectedPart.id })
+      dispatch({ type: 'SET_CONVERSATION_STATE', payload: 'tracking' })
+      loadProjects()
+      speak(selectedPart.repeatEvery != null && selectedPart.repeatEvery > 0
+        ? `Ok. Vas por vuelta 0. Aviso cada ${selectedPart.repeatEvery}.`
+        : 'Ok. Vas por vuelta 0. Sin aviso.')
+      startListeningContinuous()
+    },
+    [loadProjects, startListeningContinuous]
+  )
+
   if (!ready) {
     return (
       <div className="app">
@@ -179,8 +206,24 @@ export default function App() {
       )}
 
       {isIdle ? (
-        <main className="main">
+        <main className="main main-idle">
+          <div className="idle-header">
+            <h1 className="idle-title">A tejer</h1>
+            <button
+              type="button"
+              className="idle-btn-new glass"
+              onClick={() => setShowCreate(true)}
+            >
+              Nuevo proyecto
+            </button>
+          </div>
           <ProjectList projects={allProjects} onSelectPart={handleSelectPart} />
+          {showCreate && (
+            <CreateProjectPart
+              onCreated={handleCreatedFromTouch}
+              onCancel={() => setShowCreate(false)}
+            />
+          )}
         </main>
       ) : (
         <main className="main">
@@ -205,11 +248,13 @@ export default function App() {
           Has dicho: <strong>"{lastHeard}"</strong>
         </p>
       )}
-      <ListenButton
-        listening={session.listening}
-        onToggle={handleListenToggle}
-        supported={voiceService.isSupported()}
-      />
+      {!isIdle && (
+        <ListenButton
+          listening={session.listening}
+          onToggle={handleListenToggle}
+          supported={voiceService.isSupported()}
+        />
+      )}
     </div>
   )
 }

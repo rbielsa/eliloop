@@ -136,6 +136,161 @@ body::before {
   gap: 0.5rem;
 }
 
+.main-idle {
+  justify-content: flex-start;
+  padding: 1rem 1rem 2rem;
+  gap: 1rem;
+}
+
+.idle-header {
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.idle-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  margin: 0;
+  color: var(--text-primary);
+  letter-spacing: 0.02em;
+}
+
+.idle-btn-new {
+  padding: 0.85rem 1.75rem;
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: inherit;
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.idle-btn-new:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: var(--accent);
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+
+/* ---- Create project/part (touch) ---- */
+.create-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.create-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+.create-panel {
+  position: relative;
+  width: 100%;
+  max-width: 340px;
+  padding: 1.5rem;
+  border-radius: 16px;
+  border: 1px solid var(--glass-border);
+}
+
+.create-title {
+  margin: 0 0 1.25rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.create-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.create-fieldset {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.create-fieldset label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 0.35rem;
+}
+
+.create-input {
+  width: 100%;
+  padding: 0.65rem 0.85rem;
+  font-size: 1rem;
+  font-family: inherit;
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  box-sizing: border-box;
+}
+
+.create-input::placeholder {
+  color: var(--text-muted);
+}
+
+.create-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.create-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.create-btn {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: inherit;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.create-btn-primary {
+  color: #fff;
+  background: linear-gradient(135deg, var(--accent), #a78bfa);
+  border: none;
+}
+
+.create-btn-primary:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 0 24px var(--accent-glow);
+}
+
+.create-btn-secondary {
+  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--glass-border);
+}
+
+.create-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
 /* ---- Row display ---- */
 .row-display {
   text-align: center;

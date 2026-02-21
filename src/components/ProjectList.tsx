@@ -11,7 +11,7 @@ export function ProjectList({ projects, onSelectPart }: ProjectListProps) {
       <div className="project-list-empty glass">
         <p>Sin proyectos</p>
         <p className="project-list-hint">
-          Pulsa <strong>Escuchar</strong> y di <strong>"EliLoop"</strong> para empezar
+          Pulsa <strong>Nuevo proyecto</strong> para crear uno y empezar a tejer
         </p>
       </div>
     )
