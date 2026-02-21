@@ -36,7 +36,7 @@ export function CreateProjectPart({ onCreated, onCancel }: CreateProjectPartProp
 
   return (
     <div className="create-overlay" role="dialog" aria-modal="true" aria-label="Nuevo proyecto y parte">
-      <div className="create-panel glass">
+      <div className="create-panel">
         <h2 className="create-title">Nuevo proyecto</h2>
         <form className="create-form" onSubmit={handleSubmit}>
           <fieldset className="create-fieldset">

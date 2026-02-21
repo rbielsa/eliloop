@@ -192,8 +192,8 @@ body::before {
 .create-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.55);
+  /* Sin blur en el fondo: el panel es opaco y así no se ve todo difuminado */
 }
 
 .create-panel {
@@ -203,6 +203,9 @@ body::before {
   padding: 1.5rem;
   border-radius: 16px;
   border: 1px solid var(--glass-border);
+  /* Panel opaco para que el formulario se lea bien (no usar .glass aquí) */
+  background: rgba(18, 18, 24, 0.97);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
 }
 
 .create-title {
