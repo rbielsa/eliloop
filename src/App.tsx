@@ -13,6 +13,7 @@ import { AudioVisualiser } from './components/AudioVisualiser'
 import { HistoryList } from './components/HistoryList'
 import { ListenButton } from './components/ListenButton'
 import { StatusBar } from './components/StatusBar'
+import { TrackingButtons } from './components/TrackingButtons'
 import './App.css'
 
 export default function App() {
@@ -108,12 +109,38 @@ export default function App() {
 
     setProject(proj)
     setPart(selectedPart)
+    projectRef.current = proj
+    partRef.current = selectedPart
+    sessionRef.current = {
+      ...sessionRef.current,
+      activeProjectId: proj.id,
+      activePartId: partId,
+      conversationState: 'tracking',
+    }
     dispatch({ type: 'SET_PROJECT', payload: proj.id })
     dispatch({ type: 'SET_PART', payload: partId })
     dispatch({ type: 'SET_CONVERSATION_STATE', payload: 'tracking' })
     speak(`Ok. Vas por vuelta ${selectedPart.currentRow}`)
     startListeningContinuous()
   }, [startListeningContinuous])
+
+  const handleTouchCommand = useCallback(
+    (text: string) => {
+      const s = sessionRef.current
+      const p = projectRef.current
+      const pa = partRef.current
+      processCommand(text, s, p ?? null, pa ?? null, dispatch).then((result) => {
+        setProject(result.project)
+        setPart(result.part)
+        if (!result.project && !result.part) {
+          voiceService.stopListening()
+          dispatch({ type: 'SET_LISTENING', payload: false })
+          loadProjects()
+        }
+      })
+    },
+    [loadProjects]
+  )
 
   const handleSettingsSaved = useCallback((updatedProject: Project, updatedPart: Part | null) => {
     setProject(updatedProject)
@@ -160,6 +187,12 @@ export default function App() {
           <RowDisplay
             currentRow={part?.currentRow ?? 0}
             repeatEvery={part?.repeatEvery ?? null}
+          />
+          <TrackingButtons
+            onPlus1={() => handleTouchCommand('k')}
+            onPlus2={() => handleTouchCommand('mas dos')}
+            onSetRow={(n) => handleTouchCommand('volver a ' + n)}
+            onSave={() => handleTouchCommand('lo dejo')}
           />
           <AudioVisualiser active={session.listening} />
           <HistoryList entries={part?.history ?? []} />
